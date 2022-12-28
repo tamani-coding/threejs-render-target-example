@@ -10,11 +10,13 @@ renderer.shadowMap.enabled = true
 document.body.appendChild(renderer.domElement);
 
 // CAMERA
-const camera = new THREE.PerspectiveCamera(45,
-    window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.x = -16;
-camera.position.y = 5;
-camera.position.z = 16;
+const cameraSettings = { fov: 45, near: 0.1, far: 500 };
+const cameraPos = new THREE.Vector3(-16,5,16);
+const camera = new THREE.PerspectiveCamera(cameraSettings.fov,
+    window.innerWidth / window.innerHeight, cameraSettings.near, cameraSettings.far);
+camera.position.x = cameraPos.x;
+camera.position.y = cameraPos.y;
+camera.position.z = cameraPos.z;
 
 // ORBIT CAMERA CONTROLS
 const orbitControls = new OrbitControls(camera, renderer.domElement);
@@ -43,9 +45,11 @@ const renderTarget = new THREE.WebGLRenderTarget(rtWidth, rtHeight);
 const rtFov = 75;
 const rtAspect = rtWidth / rtHeight;
 const rtNear = 0.1;
-const rtFar = 5;
-const rtCamera = new THREE.PerspectiveCamera(rtFov, rtAspect, rtNear, rtFar);
-rtCamera.position.z = 4;
+const rtFar = 100;
+const rtCamera = new THREE.PerspectiveCamera(cameraSettings.fov, rtAspect, cameraSettings.near, cameraSettings.far);
+rtCamera.position.x = cameraPos.x / 3;
+rtCamera.position.y = cameraPos.y / 3;
+rtCamera.position.z = cameraPos.z / 3;
 
 const rtScene = new THREE.Scene();
 rtScene.background = new THREE.Color('red');
@@ -147,6 +151,9 @@ function gameLoop(time) {
     });
 
     // draw render target scene to render target
+    rtCamera.rotation.x = camera.rotation.x;
+    rtCamera.rotation.y = camera.rotation.y;
+    rtCamera.rotation.z = camera.rotation.z;
     renderer.setRenderTarget(renderTarget);
     renderer.render(rtScene, rtCamera);
     renderer.setRenderTarget(null);
