@@ -12,9 +12,9 @@ document.body.appendChild(renderer.domElement);
 // CAMERA
 const camera = new THREE.PerspectiveCamera(45,
     window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.x = -1;
+camera.position.x = -16;
 camera.position.y = 5;
-camera.position.z = 20;
+camera.position.z = 16;
 
 // ORBIT CAMERA CONTROLS
 const orbitControls = new OrbitControls(camera, renderer.domElement);
@@ -35,9 +35,9 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xa8def0);
 
 // RENDER TARGET SECTION
-
-const rtWidth = 512;
-const rtHeight = 512;
+const gateSize = { width: 6, height: 7};
+const rtWidth = gateSize.width * 512;
+const rtHeight = gateSize.height * 512;
 const renderTarget = new THREE.WebGLRenderTarget(rtWidth, rtHeight);
 
 const rtFov = 75;
@@ -45,7 +45,7 @@ const rtAspect = rtWidth / rtHeight;
 const rtNear = 0.1;
 const rtFar = 5;
 const rtCamera = new THREE.PerspectiveCamera(rtFov, rtAspect, rtNear, rtFar);
-rtCamera.position.z = 2;
+rtCamera.position.z = 4;
 
 const rtScene = new THREE.Scene();
 rtScene.background = new THREE.Color('red');
@@ -85,7 +85,7 @@ const rtCubes = [
     const color = 0xFFFFFF;
     const intensity = 1;
     const direcitonalLight = new THREE.DirectionalLight(color, intensity);
-    direcitonalLight.position.set(5, 10, 4);
+    direcitonalLight.position.set(3, 10, -4);
     direcitonalLight.castShadow = true;
     direcitonalLight.shadow.mapSize.width = 4096;
     direcitonalLight.shadow.mapSize.height = 4096;
@@ -116,11 +116,15 @@ const rtCubes = [
 const material = new THREE.MeshPhongMaterial({
     map: renderTarget.texture,
 });
-const cube = new THREE.Mesh(geometry, material);
-cube.position.y = 2;
-cube.position.x = -4;
-cube.castShadow = true;
-scene.add(cube);
+const dimensionGate = new THREE.Mesh(new THREE.PlaneGeometry(gateSize.width, gateSize.height, 32), material);
+dimensionGate.rotation.y = -Math.PI / 4
+
+dimensionGate.position.y = gateSize.height / 2;
+dimensionGate.position.x = -3;
+dimensionGate.position.z = 3;
+
+dimensionGate.castShadow = true;
+scene.add(dimensionGate);
 
 
 // RESIZE HANDLER
@@ -146,10 +150,6 @@ function gameLoop(time) {
     renderer.setRenderTarget(renderTarget);
     renderer.render(rtScene, rtCamera);
     renderer.setRenderTarget(null);
-
-    // rotate the cube in the scene
-    cube.rotation.x = time;
-    cube.rotation.y = time * 1.1;
 
     orbitControls.update();
 
