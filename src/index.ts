@@ -12,14 +12,14 @@ document.body.appendChild(renderer.domElement);
 // CAMERA
 const cameraSettings = { fov: 45, near: 0.1, far: 500 };
 const cameraPos = new THREE.Vector3(-16,8,16);
-const camera = new THREE.PerspectiveCamera(cameraSettings.fov,
+const primaryCamera = new THREE.PerspectiveCamera(cameraSettings.fov,
     window.innerWidth / window.innerHeight, cameraSettings.near, cameraSettings.far);
-camera.position.x = cameraPos.x;
-camera.position.y = cameraPos.y;
-camera.position.z = cameraPos.z;
+primaryCamera.position.x = cameraPos.x;
+primaryCamera.position.y = cameraPos.y;
+primaryCamera.position.z = cameraPos.z;
 
 // ORBIT CAMERA CONTROLS
-const orbitControls = new OrbitControls(camera, renderer.domElement);
+const orbitControls = new OrbitControls(primaryCamera, renderer.domElement);
 orbitControls.mouseButtons = {
     MIDDLE: THREE.MOUSE.ROTATE,
     RIGHT: THREE.MOUSE.PAN
@@ -80,8 +80,8 @@ const secondaryDirectionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
 }
 
 // REGULAR SCENE
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xa8def0);
+const primaryScene = new THREE.Scene();
+primaryScene.background = new THREE.Color(0xa8def0);
 {
     const color = 0xFFFFFF;
     const intensity = 1;
@@ -95,22 +95,22 @@ scene.background = new THREE.Color(0xa8def0);
     direcitonalLight.shadow.camera.right = d;
     direcitonalLight.shadow.camera.top = d;
     direcitonalLight.shadow.camera.bottom = - d;
-    scene.add(direcitonalLight);
+    primaryScene.add(direcitonalLight);
 
     const ambientLight = new THREE.AmbientLight(color, 1);
-    scene.add(ambientLight);
+    primaryScene.add(ambientLight);
 
     new GLTFLoader().load('/glb/forest-ground.glb', function (gltf: GLTF) {
         gltf.scene.traverse(function (object: THREE.Object3D) {
             object.receiveShadow = true;
         });
-        scene.add(gltf.scene);
+        primaryScene.add(gltf.scene);
     });
     new GLTFLoader().load('/glb/forest-trees.glb', function (gltf: GLTF) {
         gltf.scene.traverse(function (object: THREE.Object3D) {
                 object.castShadow = true;
         });
-        scene.add(gltf.scene);
+        primaryScene.add(gltf.scene);
     });
 }
 
@@ -125,13 +125,13 @@ targetPlane.position.x = targetPlanePosition.x;
 targetPlane.position.z = targetPlanePosition.z;
 
 targetPlane.castShadow = true;
-scene.add(targetPlane);
+primaryScene.add(targetPlane);
 
 
 // RESIZE HANDLER
 function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
+    primaryCamera.aspect = window.innerWidth / window.innerHeight;
+    primaryCamera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 window.addEventListener('resize', onWindowResize);
@@ -141,9 +141,9 @@ function gameLoop() {
     secondaryDirectionalLight.position.x = Math.cos(time * 0.002) * 10;
     secondaryDirectionalLight.position.z = Math.sin(time * 0.002) * 10;
     // draw render target scene to render target
-    secondaryCamera.rotation.x = camera.rotation.x;
-    secondaryCamera.rotation.y = camera.rotation.y;
-    secondaryCamera.rotation.z = camera.rotation.z;
+    secondaryCamera.rotation.x = primaryCamera.rotation.x;
+    secondaryCamera.rotation.y = primaryCamera.rotation.y;
+    secondaryCamera.rotation.z = primaryCamera.rotation.z;
     renderer.setRenderTarget(renderTarget);
     renderer.render(secondaryScene, secondaryCamera);
     renderer.setRenderTarget(null);
@@ -151,7 +151,7 @@ function gameLoop() {
     orbitControls.update();
 
     // render the scene to the canvas
-    renderer.render(scene, camera);
+    renderer.render(primaryScene, primaryCamera);
 
     requestAnimationFrame(gameLoop);
 }
