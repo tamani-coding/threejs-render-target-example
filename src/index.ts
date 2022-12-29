@@ -34,19 +34,19 @@ orbitControls.minPolarAngle = Math.PI / 4        // prevent top down view
 orbitControls.update();
 
 // RENDER TARGET SECTION
-const gateSize = { width: 6, height: 7};
-const gatePosition = { x: -5, y: gateSize.height / 2, z: 5};
-const renderTargetWidth = gateSize.width * 512;
-const renderTargetHeight = gateSize.height * 512;
+const targetPlaneSize = { width: 6, height: 7};
+const targetPlanePosition = { x: -5, y: targetPlaneSize.height / 2, z: 5};
+const renderTargetWidth = targetPlaneSize.width * 512;
+const renderTargetHeight = targetPlaneSize.height * 512;
 const renderTarget = new THREE.WebGLRenderTarget(renderTargetWidth, renderTargetHeight);
 
 // SECONDARY CAMERA
 const secondaryAspect = renderTargetWidth / renderTargetHeight;
 const secondaryCamera = new THREE.PerspectiveCamera(cameraSettings.fov, secondaryAspect, 
     cameraSettings.near, cameraSettings.far);
-secondaryCamera.position.x = gatePosition.x;
-secondaryCamera.position.y = gatePosition.y + 4;
-secondaryCamera.position.z = gatePosition.z;
+secondaryCamera.position.x = targetPlanePosition.x;
+secondaryCamera.position.y = targetPlanePosition.y + 4;
+secondaryCamera.position.z = targetPlanePosition.z;
 secondaryCamera.lookAt(new THREE.Vector3(10,5,-10));
 
 // SECONDARY SCENE
@@ -117,15 +117,15 @@ scene.background = new THREE.Color(0xa8def0);
 const material = new THREE.MeshPhongMaterial({
     map: renderTarget.texture,
 });
-const dimensionGate = new THREE.Mesh(new THREE.PlaneGeometry(gateSize.width, gateSize.height, 32), material);
-dimensionGate.rotation.y = -Math.PI / 4
+const targetPlane = new THREE.Mesh(new THREE.PlaneGeometry(targetPlaneSize.width, targetPlaneSize.height, 32), material);
+targetPlane.rotation.y = -Math.PI / 4
 
-dimensionGate.position.y = gatePosition.y;
-dimensionGate.position.x = gatePosition.x;
-dimensionGate.position.z = gatePosition.z;
+targetPlane.position.y = targetPlanePosition.y;
+targetPlane.position.x = targetPlanePosition.x;
+targetPlane.position.z = targetPlanePosition.z;
 
-dimensionGate.castShadow = true;
-scene.add(dimensionGate);
+targetPlane.castShadow = true;
+scene.add(targetPlane);
 
 
 // RESIZE HANDLER
