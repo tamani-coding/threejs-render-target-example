@@ -33,28 +33,25 @@ orbitControls.maxPolarAngle = Math.PI / 2 - 0.05 // prevent camera below ground
 orbitControls.minPolarAngle = Math.PI / 4        // prevent top down view
 orbitControls.update();
 
-// SCENE
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xa8def0);
-
 // RENDER TARGET SECTION
 const gateSize = { width: 6, height: 7};
-const dimensionGatePosition = { x: -5, y: gateSize.height / 2, z: 5};
-const rtWidth = gateSize.width * 512;
-const rtHeight = gateSize.height * 512;
-const renderTarget = new THREE.WebGLRenderTarget(rtWidth, rtHeight);
+const gatePosition = { x: -5, y: gateSize.height / 2, z: 5};
+const renderTargetWidth = gateSize.width * 512;
+const renderTargetHeight = gateSize.height * 512;
+const renderTarget = new THREE.WebGLRenderTarget(renderTargetWidth, renderTargetHeight);
 
-
-const secondaryAspect = rtWidth / rtHeight;
-const secondaryCamera = new THREE.PerspectiveCamera(cameraSettings.fov, secondaryAspect, cameraSettings.near, cameraSettings.far);
-secondaryCamera.position.x = dimensionGatePosition.x;
-secondaryCamera.position.y = dimensionGatePosition.y + 4;
-secondaryCamera.position.z = dimensionGatePosition.z;
+// SECONDARY CAMERA
+const secondaryAspect = renderTargetWidth / renderTargetHeight;
+const secondaryCamera = new THREE.PerspectiveCamera(cameraSettings.fov, secondaryAspect, 
+    cameraSettings.near, cameraSettings.far);
+secondaryCamera.position.x = gatePosition.x;
+secondaryCamera.position.y = gatePosition.y + 4;
+secondaryCamera.position.z = gatePosition.z;
 secondaryCamera.lookAt(new THREE.Vector3(10,5,-10));
 
+// SECONDARY SCENE
 const secondaryScene = new THREE.Scene();
 secondaryScene.background = new THREE.Color(0xD61C4E);
-
 const secondaryDirectionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
 {
     secondaryDirectionalLight.position.set(-10, 10, 10);
@@ -82,12 +79,9 @@ const secondaryDirectionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
     });
 }
 
-const boxWidth = 1;
-const boxHeight = 1;
-const boxDepth = 1;
-const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
-
 // REGULAR SCENE
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xa8def0);
 {
     const color = 0xFFFFFF;
     const intensity = 1;
@@ -126,9 +120,9 @@ const material = new THREE.MeshPhongMaterial({
 const dimensionGate = new THREE.Mesh(new THREE.PlaneGeometry(gateSize.width, gateSize.height, 32), material);
 dimensionGate.rotation.y = -Math.PI / 4
 
-dimensionGate.position.y = dimensionGatePosition.y;
-dimensionGate.position.x = dimensionGatePosition.x;
-dimensionGate.position.z = dimensionGatePosition.z;
+dimensionGate.position.y = gatePosition.y;
+dimensionGate.position.x = gatePosition.x;
+dimensionGate.position.z = gatePosition.z;
 
 dimensionGate.castShadow = true;
 scene.add(dimensionGate);
